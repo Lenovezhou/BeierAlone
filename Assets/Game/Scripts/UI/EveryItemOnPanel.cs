@@ -4,11 +4,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using HoloToolkit.Unity.InputModule;
 
-public class EveryItemOnPanel : MonoBehaviour,IInputClickHandler,IFocusable {
+public class EveryItemOnPanel : SpriteButton,IInputClickHandler {
 
     #region 字段
     private GameObject rotateobj;
     private SpriteRenderer spriterenderer;
+
+    protected override string SoundPath
+    {
+        get
+        {
+            return "Spawn";
+        }
+    }
     #endregion
 
     #region UNITY回调
@@ -20,18 +28,13 @@ public class EveryItemOnPanel : MonoBehaviour,IInputClickHandler,IFocusable {
 
 
 
-#if UNITY_EDITOR
-    private void OnMouseDown()
-    {
-        OnPressed();
-    }
-#endif
+
 
 #region Holotoolkit回调
-    public void OnPressed()
+    protected override void OnPressed()
     {
         //声音
-        Sound.Instance.PlayerEffect("Spawn");
+        base.OnPressed(); 
 
         string str = gameObject.name;
         string id = Guid.NewGuid().ToString();
@@ -39,20 +42,35 @@ public class EveryItemOnPanel : MonoBehaviour,IInputClickHandler,IFocusable {
         MessageRecever.Instance.AddobjectToWorld(str, id,transform.position);
     }
 
-    public void OnFocusEnter()
+    //public void OnInputClicked(InputClickedEventData eventData)
+    //{
+    //    OnPressed();
+    //}
+    #region 父类状态机抽象
+    protected override void FocusIn()
     {
-        spriterenderer.color = Color.green;
+        if (spriterenderer)
+            spriterenderer.color = Color.green;
     }
 
-    public void OnFocusExit()
+    protected override void FocusOut()
     {
-        spriterenderer.color = Color.white;
+        if (spriterenderer)
+            spriterenderer.color = Color.white;
     }
 
-    public void OnInputClicked(InputClickedEventData eventData)
+
+    protected override void FocusInUpdate(float timer)
     {
-        OnPressed();
+    //    spriterenderer.color = Color.Lerp(spriterenderer.color, Color.green, 0.125f);
     }
+    protected override void FocusoutUpdate(float timer)
+    {
+    //    spriterenderer.color = Color.Lerp(spriterenderer.color, Color.yellow, 0.125f);
+    }
+
+    #endregion
+
 
     #endregion
 

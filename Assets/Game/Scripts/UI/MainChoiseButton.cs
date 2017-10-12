@@ -4,23 +4,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MainChoiseButton : MonoBehaviour, IInputClickHandler
+public class MainChoiseButton : SpriteButton, IInputClickHandler
 {
 
-
-#if UNITY_EDITOR
-    private void OnMouseDown()
+    private TextMesh focuschang;
+    protected override string SoundPath
     {
-        OnPressed();
+        get
+        {
+            return "MainChoiseButton";
+        }
     }
-#endif
 
 
-    public void OnPressed()
+    protected override void OnPressed()
     {
         //声音
-        Sound.Instance.PlayerEffect("MainChoiseButton");
-
+        //Sound.Instance.PlayerEffect("MainChoiseButton");
+        base.OnPressed();
         string str2 = gameObject.name;
         Dictionary<string, Action> acts = MessageRecever.Instance.acts;
        // DebuggerForMe.Instance.WriteForword("》" + str2,true);
@@ -31,8 +32,33 @@ public class MainChoiseButton : MonoBehaviour, IInputClickHandler
         CustomMessages.Instance.SendCommand(str2);
     }
 
-    public void OnInputClicked(InputClickedEventData eventData)
+    //public void OnInputClicked(InputClickedEventData eventData)
+    //{
+    //    OnPressed();
+    //}
+    #region 父类状态机抽象
+    protected override void Awake()
     {
-        OnPressed();
+        base.Awake();
+        focuschang = GetComponentInChildren<TextMesh>();
     }
+    protected override void FocusIn()
+    {
+        focuschang.color = Color.green;
+    }
+
+    protected override void FocusOut()
+    {
+        focuschang.color = Color.yellow;
+    }
+    protected override void FocusInUpdate(float timer)
+    {
+    //    focuschang.color = Color.Lerp(focuschang.color, Color.green,0.125f);
+    }
+    protected override void FocusoutUpdate(float timer)
+    {
+     //   focuschang.color = Color.Lerp(focuschang.color, Color.yellow, 0.125f);
+    }
+    #endregion
+
 }
